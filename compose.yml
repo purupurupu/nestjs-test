@@ -2,6 +2,7 @@ version: '3.8'
 services:
   app:
     build: .
+    container_name: app-backend
     command: npm run start:dev
     volumes:
       - .:/usr/src/app
@@ -9,11 +10,14 @@ services:
     ports:
       - '3000:3000'
     environment:
-      DATABASE_URL: 'postgresql://user:password@db:5432/mydb?schema=public'
+      DATABASE_URL: 'postgresql://user:password@app-postgres:5432/mydb?schema=public'
     depends_on:
       - db
+    networks:
+      nestjs:
   db:
     image: postgres:13
+    container_name: app-postgres
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
@@ -22,6 +26,11 @@ services:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+    networks:
+      nestjs:
 volumes:
   postgres_data:
+
+networks:
+  nestjs:
+    driver: bridge
